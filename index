@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AP Gov Quiz — Units 1 & 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;
+  --surface:#0c1018;
+  --card:#111825;
+  --card2:#161e2d;
+  --border:#1e2d44;
+  --border2:#263650;
+  --gold:#d4a843;
+  --gold2:#e8c870;
+  --gold-dim:rgba(212,168,67,0.12);
+  --red:#e05656;
+  --green:#4db87a;
+  --blue:#5b9bd5;
+  --text:#eef0f4;
+  --muted:#7a8fa8;
+  --muted2:#a0b3c8;
+  --serif:'Libre Baskerville',Georgia,serif;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;
+}
+
+#screen-home,#screen-quiz,#screen-results{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+}
+.active{display:flex!important;}
+
+/* ── HOME ── */
+#screen-home{justify-content:center;padding:40px 24px;}
+.home-inner{max-width:600px;width:100%;text-align:center;}
+.home-badge{
+  display:inline-block;
+  font-family:var(--mono);font-size:10px;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;
+  border:1px solid rgba(212,168,67,.3);padding:5px 14px;
+  border-radius:100px;margin-bottom:32px;background:var(--gold-dim);
+}
+.home-title{
+  font-family:var(--serif);
+  font-size:clamp(36px,7vw,66px);font-weight:700;line-height:1.05;
+  color:#fff;margin-bottom:8px;
+}
+.home-title em{font-style:italic;color:var(--gold);}
+.home-sub{font-size:15px;color:var(--muted);margin-bottom:44px;line-height:1.6;}
+.home-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:36px;}
+.home-stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px 12px;}
+.home-stat-n{font-family:var(--serif);font-size:32px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:4px;}
+.home-stat-l{font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;}
+.settings-group{width:100%;text-align:left;margin-bottom:16px;}
+.settings-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:10px;}
+.pill-group{display:flex;flex-wrap:wrap;gap:6px;}
+.pill{
+  padding:7px 15px;border:1px solid var(--border);border-radius:100px;
+  background:transparent;color:var(--muted);font-family:var(--mono);font-size:11px;
+  cursor:pointer;transition:all .18s;
+}
+.pill:hover{border-color:var(--gold);color:var(--gold);}
+.pill.sel{background:var(--gold-dim);border-color:var(--gold);color:var(--gold);}
+.start-btn{
+  width:100%;padding:18px;background:var(--gold);color:#07090f;
+  font-family:var(--serif);font-size:17px;font-weight:700;
+  border:none;border-radius:8px;cursor:pointer;transition:all .2s;
+  letter-spacing:.5px;margin-top:16px;
+}
+.start-btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(212,168,67,.25);}
+
+/* ── QUIZ ── */
+#screen-quiz{padding:0;}
+.quiz-topbar{
+  width:100%;background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;gap:16px;
+  position:sticky;top:0;z-index:10;
+}
+.quiz-back{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;transition:color .2s;flex-shrink:0;}
+.quiz-back:hover{color:var(--text);}
+.progress-wrap{flex:1;}
+.progress-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width .4s ease;}
+.progress-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:5px;letter-spacing:.5px;}
+.score-pill{background:rgba(77,184,122,.12);border:1px solid rgba(77,184,122,.25);color:var(--green);font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:100px;flex-shrink:0;}
+.quiz-body{max-width:700px;width:100%;margin:0 auto;padding:40px 24px 80px;}
+.q-category{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:14px;}
+.q-scenario{
+  background:rgba(212,168,67,.06);border-left:3px solid var(--gold);
+  border-radius:0 6px 6px 0;padding:14px 18px;margin-bottom:20px;
+  font-size:13.5px;color:var(--muted2);line-height:1.75;font-style:italic;
+}
+.q-text{font-family:var(--serif);font-size:20px;color:#fff;line-height:1.55;margin-bottom:28px;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{
+  display:flex;align-items:flex-start;gap:14px;width:100%;text-align:left;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 18px;color:var(--muted2);font-size:14px;line-height:1.55;
+  cursor:pointer;transition:all .18s;font-family:var(--sans);
+}
+.opt:hover:not(:disabled){border-color:var(--gold);background:var(--card2);color:var(--text);}
+.opt-letter{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);min-width:18px;padding-top:2px;transition:color .18s;flex-shrink:0;}
+.opt:hover:not(:disabled) .opt-letter{color:var(--gold);}
+.opt.correct{border-color:var(--green);background:rgba(77,184,122,.08);color:var(--green);}
+.opt.correct .opt-letter{color:var(--green);}
+.opt.wrong{border-color:var(--red);background:rgba(224,86,86,.08);color:var(--red);}
+.opt.wrong .opt-letter{color:var(--red);}
+.opt:disabled{cursor:default;}
+.explanation{
+  margin-top:16px;background:var(--card2);border-radius:8px;
+  border-left:3px solid var(--green);padding:16px 18px;
+  font-size:13.5px;color:var(--muted2);line-height:1.75;
+  animation:fadeUp .3s ease;
+}
+.explanation.wrong-exp{border-left-color:var(--red);}
+.explanation strong{color:var(--text);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:12px;}
+.btn-outline{padding:11px 22px;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:6px;font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-outline:hover:not(:disabled){border-color:var(--gold);color:var(--gold);}
+.btn-outline:disabled{opacity:.25;cursor:default;}
+.btn-gold{padding:11px 28px;background:var(--gold);color:#07090f;border:none;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-gold:hover{background:var(--gold2);}
+
+/* ── RESULTS ── */
+#screen-results{justify-content:center;padding:40px 24px;}
+.results-inner{max-width:680px;width:100%;text-align:center;}
+.results-score{font-family:var(--serif);font-size:clamp(72px,14vw,110px);font-weight:700;color:var(--gold);line-height:1;margin-bottom:4px;}
+.results-label{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+.results-msg{font-size:15px;color:var(--muted2);margin-bottom:32px;line-height:1.6;}
+.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.results-stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 10px;}
+.results-stat-n{font-family:var(--serif);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
+.results-stat-l{font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;}
+.results-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:32px;text-align:left;}
+.cat-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.cat-pct{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1;margin-bottom:3px;}
+.cat-name{font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;line-height:1.4;}
+.review-section-title{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin:28px 0 12px;text-align:left;}
+.review-list{text-align:left;display:flex;flex-direction:column;gap:10px;}
+.review-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;border-left:3px solid var(--red);}
+.review-q{font-size:13px;color:var(--text);margin-bottom:6px;font-weight:500;line-height:1.5;}
+.review-a{font-size:12px;color:var(--muted);line-height:1.5;}
+.review-exp{font-size:12px;color:var(--muted2);line-height:1.65;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<div id="screen-home" class="active">
+  <div class="home-inner">
+    <div class="home-badge">AP United States Government</div>
+    <h1 class="home-title">Units 1 &amp; 2<br><em>Quiz</em></h1>
+    <p class="home-sub">65-question bank covering founding documents, constitutional structure, branches of government, federalism, landmark cases, amendments, and more. A fresh random set every round.</p>
+    <div class="home-stats">
+      <div class="home-stat"><div class="home-stat-n">65</div><div class="home-stat-l">Questions</div></div>
+      <div class="home-stat"><div class="home-stat-n">12</div><div class="home-stat-l">Categories</div></div>
+      <div class="home-stat"><div class="home-stat-n">∞</div><div class="home-stat-l">Random Rounds</div></div>
+    </div>
+    <div class="settings-group">
+      <span class="settings-label">Questions per round</span>
+      <div class="pill-group" id="size-pills">
+        <button class="pill" data-val="10">10</button>
+        <button class="pill sel" data-val="15">15</button>
+        <button class="pill" data-val="20">20</button>
+        <button class="pill" data-val="30">30</button>
+        <button class="pill" data-val="65">All 65</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <span class="settings-label">Filter by category</span>
+      <div class="pill-group" id="cat-pills"></div>
+    </div>
+    <button class="start-btn" onclick="startQuiz()">Begin Quiz →</button>
+  </div>
+</div>
+
+<div id="screen-quiz">
+  <div class="quiz-topbar">
+    <button class="quiz-back" onclick="goHome()">←</button>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="prog-label">Question 1 of 15</span>
+        <span id="cat-label"></span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="score-pill" id="score-pill">+0</div>
+  </div>
+  <div class="quiz-body">
+    <div id="q-category" class="q-category"></div>
+    <div id="q-scenario" class="q-scenario" style="display:none"></div>
+    <div id="q-text" class="q-text"></div>
+    <div id="options" class="options"></div>
+    <div id="explanation" class="explanation" style="display:none"></div>
+    <div class="quiz-nav">
+      <button class="btn-outline" id="btn-prev" onclick="prevQ()" disabled>← Prev</button>
+      <button class="btn-gold" id="btn-next" onclick="nextQ()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-results">
+  <div class="results-inner">
+    <div class="results-score" id="res-pct"></div>
+    <div class="results-label" id="res-fraction"></div>
+    <div class="results-msg" id="res-msg"></div>
+    <div class="results-grid">
+      <div class="results-stat"><div class="results-stat-n" id="res-correct" style="color:var(--green)"></div><div class="results-stat-l">Correct</div></div>
+      <div class="results-stat"><div class="results-stat-n" id="res-wrong" style="color:var(--red)"></div><div class="results-stat-l">Incorrect</div></div>
+      <div class="results-stat"><div class="results-stat-n" id="res-total" style="color:var(--gold)"></div><div class="results-stat-l">Total</div></div>
+    </div>
+    <div class="results-actions">
+      <button class="btn-gold" onclick="startQuiz()">New Random Round →</button>
+      <button class="btn-outline" onclick="goHome()">Change Settings</button>
+    </div>
+    <div id="review-section"></div>
+  </div>
+</div>
+
+<script>
+const BANK = [
+  // ── FOUNDING DOCUMENTS ──────────────────────────────────────────────────────
+  {id:1,cat:"Founding Documents",
+   q:"The Declaration of Independence's claim that people possess 'unalienable rights' is most directly rooted in which philosopher's ideas?",
+   opts:["Thomas Hobbes — government must maintain order by any means necessary","John Locke — people hold natural rights to life, liberty, and property that precede government","Montesquieu — freedom requires separation of governmental powers","Rousseau — the general will of all citizens must govern"],
+   ans:1,
+   exp:"Jefferson drew heavily on John Locke's Second Treatise (1689). Locke argued that natural rights exist prior to government; people form a social contract to protect them. If government violates the contract, the people may dissolve it — the exact argument Jefferson made against George III. Jefferson changed Locke's 'property' to 'pursuit of happiness.'"},
+
+  {id:2,cat:"Founding Documents",
+   q:"Which foundational principle is most directly illustrated by the system of checks and balances?",
+   opts:["Popular sovereignty — government power comes from the people","Republicanism — citizens elect representatives to govern","Limited government — no single branch can accumulate unchecked power","Federalism — power is divided between national and state governments"],
+   ans:2,
+   exp:"Checks and balances operationalize limited government. Each branch is given tools to resist the others, preventing the concentration of power the Framers feared. Federalist #51: 'Ambition must be made to counteract ambition.'"},
+
+  {id:3,cat:"Founding Documents",
+   q:"The Preamble's 'We the People' most directly reflects which principle?",
+   opts:["Federalism — states created the federal government","Popular sovereignty — government derives legitimacy from the consent of the governed","Republicanism — professional legislators best represent citizens","Limited government — the Constitution restricts direct citizen participation"],
+   ans:1,
+   exp:"'We the People' is the Constitution's clearest statement of popular sovereignty. This replaced the Articles of Confederation's opening 'We the undersigned delegates of the States,' shifting the basis of legitimacy from states to the people directly."},
+
+  {id:4,cat:"Founding Documents",
+   q:"The Bill of Rights was ratified in 1791 primarily to:",
+   opts:["Expand federal power over states that refused to comply","Enumerate rights the federal government could not violate, satisfying Anti-Federalist demands for constitutional rights protections","Replace the first 10 articles of the Constitution","Guarantee unanimous state ratification for all future amendments"],
+   ans:1,
+   exp:"The Bill of Rights was the compromise that secured ratification. Anti-Federalists feared that without enumerated rights, the new federal government would trample individual liberties. Madison drafted the first 10 amendments protecting free speech, religion, due process, and reserving remaining powers to states and people."},
+
+  {id:5,cat:"Founding Documents",
+   q:"The 9th Amendment was included primarily to address what concern?",
+   opts:["That listing rights would imply all unlisted rights were surrendered to government","That Congress would use enumerated rights to expand its own power","That states would use unenumerated rights to override federal legislation","That the President could use unlisted rights as executive order authority"],
+   ans:0,
+   exp:"Madison's concern: if you create an explicit list of rights, people might argue any right not on the list is forfeited. The 9th Amendment directly refutes this — the fact that a right isn't enumerated doesn't mean government can violate it. This became the constitutional basis for rights like privacy (Griswold v. Connecticut, 1965)."},
+
+  {id:6,cat:"Founding Documents",
+   q:"The Declaration of Independence justifies revolution by invoking which political theory?",
+   opts:["Divine right of kings — colonists had a God-given right to self-govern","Social contract theory — government derives just powers from consent of the governed; persistent violation justifies revolution","Natural law — the laws of nature automatically grant independence to any group seeking freedom","Mercantilism — economic exploitation voided any political obligation to the Crown"],
+   ans:1,
+   exp:"The Declaration applies Lockean social contract theory: (1) people possess natural rights, (2) governments are created to secure those rights, (3) authority derives from the consent of the governed, (4) when government persistently violates its purpose, the people have the right to alter or abolish it."},
+
+  // ── ARTICLES OF CONFEDERATION ────────────────────────────────────────────────
+  {id:7,cat:"Articles of Confederation",
+   q:"What was the most significant structural flaw of the Articles of Confederation?",
+   opts:["It created a bicameral legislature too prone to gridlock","Congress could only request money from states — it had no power to levy taxes directly","The President had too much power and could veto congressional legislation","Federal courts were too powerful and routinely overrode state decisions"],
+   ans:1,
+   exp:"Congress under the Articles could request funds but not compel payment. States routinely ignored these requests. Add to this: no power to regulate interstate commerce, no executive to enforce laws, no national courts, and an amendment process requiring unanimous consent. These failures — crystallized by Shays' Rebellion — made the Constitutional Convention inevitable."},
+
+  {id:8,cat:"Articles of Confederation",
+   q:"Shays' Rebellion (1786–87) is historically significant because it:",
+   opts:["Proved state militias could manage uprisings without federal help","Exposed the Articles' inability to maintain order — the federal government had no army, money, or authority to act","Led directly to the Bill of Rights to protect debtor rights","Demonstrated the Articles' strong executive was sufficient for national security"],
+   ans:1,
+   exp:"When indebted Massachusetts farmers shut down courts and threatened the federal arsenal, the national government was powerless — no army, no money, no authority. Massachusetts had to fund its own private militia. Washington wrote that the rebellion confirmed the need for a stronger central government, directly motivating the Constitutional Convention of 1787."},
+
+  {id:9,cat:"Articles of Confederation",
+   q:"The Articles required unanimous consent of all 13 states to amend. The Constitution changed this to:",
+   opts:["A simple majority of states, making reform much easier","2/3 of Congress plus 3/4 of states, balancing stability with ability to reform","Amendments impossible without a full constitutional convention","Presidential proposal ratified by a 3/4 congressional supermajority"],
+   ans:1,
+   exp:"Article V replaced the Articles' impossibly high bar (13/13 states) with a difficult but achievable threshold: 2/3 of Congress + 3/4 of states (38 of 50). The President has no role in the amendment process. The higher the threshold, the more stable but also the more resistant to correction — the Articles failed precisely because they were unamendable."},
+
+  // ── CONSTITUTIONAL CONVENTION ────────────────────────────────────────────────
+  {id:10,cat:"Constitutional Convention",
+   q:"The Great Compromise resolved the large state vs. small state dispute by:",
+   opts:["Giving large states more senators and small states more House representatives","Creating a bicameral Congress: House with population-based representation, Senate with equal representation (2 per state)","Requiring all revenue bills to pass the Senate first","Awarding extra Electoral College votes to small states"],
+   ans:1,
+   exp:"Roger Sherman of Connecticut brokered the compromise: the House is proportional (large-state advantage), the Senate is equal with 2 senators per state (small-state protection). This is why both chambers must agree to pass legislation — each protects a different constituency."},
+
+  {id:11,cat:"Constitutional Convention",
+   q:"The Three-Fifths Compromise (Art. I §2) counted enslaved persons as three-fifths of a person for the purpose of:",
+   opts:["Determining voting rights for free Black citizens in Southern states","Calculating each state's representation in the House and its share of direct federal taxes","Dividing the Senate between slave and free states","Setting the property threshold for citizenship"],
+   ans:1,
+   exp:"The Three-Fifths Compromise gave Southern slave states significantly more House seats than their free population warranted, boosting their political power for decades. It was nullified by the 13th and 14th Amendments. It was a deeply immoral bargain accepted by Northern delegates to secure Southern ratification."},
+
+  {id:12,cat:"Constitutional Convention",
+   q:"Which compromise allowed the international slave trade to continue for 20 years after ratification?",
+   opts:["The Three-Fifths Compromise — counting enslaved people for representation","The Commerce and Slave Trade Compromise — Congress could not ban slave importation before 1808","The Great Compromise — equal Senate representation prevented immediate abolition","The Fugitive Slave Clause — requiring return of escaped enslaved people"],
+   ans:1,
+   exp:"Article I §9 prohibited Congress from banning the slave trade before 1808 — a 20-year protection demanded by South Carolina and Georgia. Congress acted on the first possible day, banning the international slave trade effective January 1, 1808. This was one of the Constitution's three explicit slavery compromises."},
+
+  // ── FEDERALIST PAPERS ────────────────────────────────────────────────────────
+  {id:13,cat:"Federalist Papers",
+   q:"Federalist #10 (Madison) argued that a large republic was preferable to direct democracy primarily because:",
+   opts:["It allows all citizens to directly participate in every major decision","The diversity of factions in a large republic makes it nearly impossible for any single faction to dominate and trample minority rights","It concentrates wisdom in elected representatives who make better decisions","It eliminates the formation of dangerous political factions entirely"],
+   ans:1,
+   exp:"Madison's problem: factions are inevitable in a free society. His solution: in a large republic, the multiplicity of factions prevents any one from forming a majority. A small direct democracy is vulnerable to majority faction tyranny — a large diverse republic has built-in protection through factional competition."},
+
+  {id:14,cat:"Federalist Papers",
+   q:"Federalist #51 (Madison) argues the best protection against tyranny is:",
+   opts:["A written Bill of Rights that explicitly limits government power","Giving each branch constitutional tools and incentives to check the other branches","Relying on virtuous elected leaders","Dividing the country into small competing republics"],
+   ans:1,
+   exp:"Federalist #51: 'Ambition must be made to counteract ambition.' Madison argued that giving each branch the means to resist encroachment — and ensuring each has institutional interests to protect — creates a self-enforcing system. 'If men were angels, no government would be necessary.' Structural design must compensate for human imperfection."},
+
+  {id:15,cat:"Federalist Papers",
+   q:"Federalist #70 (Hamilton) argued for a single executive rather than an executive council because:",
+   opts:["A single person ensures 'energy in the executive' — decisiveness, accountability, and unified command","An executive council would give too much power to individual states","A single executive is more controllable by Congress","The Constitution specifically prohibited executive councils"],
+   ans:0,
+   exp:"Hamilton: 'Energy in the executive is a leading character in the definition of good government.' A single executive ensures decisiveness, accountability (one person to blame), secrecy in negotiations, and unified command. Committee leadership would produce deadlock and diffuse responsibility."},
+
+  {id:16,cat:"Federalist Papers",
+   q:"Federalist #78 (Hamilton) described the judiciary as the 'least dangerous branch' primarily because:",
+   opts:["Federal judges are elected by the people with democratic legitimacy","The judiciary controls neither the 'sword' nor the 'purse' — it can only issue judgments that others must enforce","The Senate can remove any federal judge with a simple majority","Article III explicitly limits the Court to 9 justices who serve renewable 4-year terms"],
+   ans:1,
+   exp:"Hamilton: the executive holds the 'sword' and the legislature holds the 'purse.' The judiciary has neither — it depends on the executive to enforce rulings and Congress to fund it. This structural weakness is why courts need independence (life tenure, protected salary). Without it, judges would be too intimidated to rule against the powerful."},
+
+  {id:17,cat:"Federalist Papers",
+   q:"Federalist #78 argued that judicial review — courts striking down unconstitutional laws — is:",
+   opts:["Explicitly granted by Article III to the Supreme Court","Anti-democratic but reluctantly necessary","Implied by the logic of a supreme written Constitution — courts must prefer the Constitution over legislation when they conflict","A power that properly belongs to Congress, not courts"],
+   ans:2,
+   exp:"Hamilton's key argument: if the Constitution is supreme law and an ordinary law contradicts it, courts must enforce the Constitution. This isn't judges overriding the people — it IS the people's will (expressed in the Constitution) overriding their temporary representatives. Note: this power is NOT in Article III — Marshall derived it in Marbury v. Madison (1803)."},
+
+  // ── ANTI-FEDERALIST / BRUTUS I ───────────────────────────────────────────────
+  {id:18,cat:"Brutus vs. Anti-Federalist",
+   q:"Brutus I argued the proposed Constitution was most dangerous because:",
+   opts:["It gave Congress too little power to regulate interstate commerce","A strong central government would inevitably destroy state power and individual liberty — especially through an unaccountable federal judiciary","The executive branch was too weak to protect against foreign threats","A Bill of Rights was unnecessary since state constitutions already protected rights"],
+   ans:1,
+   exp:"Brutus I made two central arguments: (1) A large republic is unworkable — representatives are too distant to know their constituents; and (2) the Necessary & Proper Clause and federal judiciary would give the central government unlimited power. He specifically feared unelected life-tenured federal judges who could expand federal power without check."},
+
+  {id:19,cat:"Brutus vs. Anti-Federalist",
+   q:"Brutus I's criticism of the federal judiciary directly contrasts with which Federalist Paper?",
+   opts:["Federalist #10 — arguing large republics protect against factional tyranny","Federalist #51 — arguing checks and balances protect against governmental overreach","Federalist #78 — arguing life tenure and independence make courts guardians of the Constitution","Federalist #70 — arguing a single executive provides energy and accountability"],
+   ans:2,
+   exp:"The classic AP comparison: Brutus I argued federal courts with life tenure and power to strike laws would become tyrannical. Federalist #78 (Hamilton) argued life tenure is NECESSARY for judicial independence — courts must be insulated from political pressure to enforce constitutional limits against popular majorities. Same institution, radically different assessments."},
+
+  {id:20,cat:"Brutus vs. Anti-Federalist",
+   scenario:"A federal court strikes down a state referendum supported by 74% of voters, ruling it violates the 14th Amendment. Critics argue unelected judges should not override democratic will.",
+   q:"Which position does this scenario most directly illustrate?",
+   opts:["The Federalist position — courts exist to protect constitutional rights from majority tyranny","The Anti-Federalist position (Brutus I) — unelected life-tenured judges accumulate power unaccountable to the people","The Social Contract position — the people have a right to revolt against judicial tyranny","The Federalist #10 position — judicial factions produce a multiplicity of competing rulings"],
+   ans:1,
+   exp:"This directly illustrates Brutus I's fear: federal courts with life tenure striking down popular democratic decisions. Hamilton (Federalist #78) would counter that this is the court doing its job — protecting constitutional rights even when majorities want to violate them. This tension between democratic accountability and constitutional rights protection is permanent."},
+
+  // ── SEPARATION OF POWERS ─────────────────────────────────────────────────────
+  {id:21,cat:"Separation of Powers",
+   scenario:"The President issues an executive order implementing major immigration policy that Congress has debated but never passed.",
+   q:"Which constitutional principle is most directly at stake?",
+   opts:["Federalism — states have reserved power over immigration under the 10th Amendment","Separation of powers — the executive cannot make law; legislative power belongs exclusively to Congress (Art. I)","Judicial review — only the Supreme Court can determine if immigration policy is constitutional","The Commerce Clause — immigration falls under Congress's interstate commerce power"],
+   ans:1,
+   exp:"Article I §1 vests ALL legislative power in Congress. Executive orders can implement existing statutory authority but cannot create new law or substitute for congressional action. The Court applies the Youngstown framework: presidential power is at its lowest when acting against the expressed or implied will of Congress."},
+
+  {id:22,cat:"Separation of Powers",
+   scenario:"The President commits U.S. troops to combat operations overseas without a declaration of war. The operation extends to 75 days.",
+   q:"Under the War Powers Resolution (1973), what is required?",
+   opts:["The President must obtain a formal war declaration within 90 days or withdraw all forces","Congress must vote to defund the operation to stop it; the President has no reporting obligation","The President must notify Congress within 48 hours; forces must be withdrawn within 60 days unless Congress authorizes continuation","The Supreme Court must rule on constitutionality before the operation can extend beyond 30 days"],
+   ans:2,
+   exp:"The War Powers Resolution requires: (1) presidential notification to Congress within 48 hours of deploying forces into hostilities, and (2) withdrawal within 60 days unless Congress declares war or specifically authorizes continuation. Every President since Nixon has disputed the WPR's constitutionality, but none have openly defied it."},
+
+  {id:23,cat:"Separation of Powers",
+   scenario:"A congressional subcommittee subpoenas White House emails related to a domestic policy decision. The President refuses, claiming executive privilege.",
+   q:"Based on United States v. Nixon (1974), how is this resolved?",
+   opts:["Executive privilege is absolute — the President can never be compelled to produce internal communications","Executive privilege exists but is not absolute — it must yield to a specific, demonstrated need for evidence","Congress has no power to subpoena the President — only the Supreme Court can compel production","National security designation automatically makes all White House communications privileged"],
+   ans:1,
+   exp:"U.S. v. Nixon: the Court unanimously held executive privilege is constitutionally grounded (implicit in separation of powers) but NOT absolute. A generalized interest in confidentiality must yield to a specific, demonstrated need — particularly in criminal proceedings. Nixon had to hand over the tapes."},
+
+  {id:24,cat:"Separation of Powers",
+   q:"The Youngstown Sheet & Tube Co. v. Sawyer (1952) case established that:",
+   opts:["The President has inherent emergency powers to seize private industry during wartime","Presidential power is strongest when acting pursuant to congressional authorization, and weakest when acting against congressional will","The President can take any action necessary to prevent national economic collapse","Congress must explicitly authorize all executive actions, or they are automatically unconstitutional"],
+   ans:1,
+   exp:"Justice Jackson's famous three-zone framework: (1) Presidential power is at its maximum when acting with Congress's express or implied authorization; (2) in a 'twilight zone' when Congress has been silent; (3) at its lowest when acting against the expressed or implied will of Congress. Truman's seizure of steel mills fell into category 3 — Congress had considered and rejected seizure authority — making it unconstitutional."},
+
+  // ── CHECKS & BALANCES ────────────────────────────────────────────────────────
+  {id:25,cat:"Checks & Balances",
+   scenario:"Congress passes a climate bill 267–168 in the House and 63–37 in the Senate. The President vetoes it.",
+   q:"What is required for Congress to override the veto?",
+   opts:["A simple majority in both chambers — since it already passed, Congress can override automatically","2/3 of both the House (290 votes) and Senate (67 votes) — neither chamber currently has enough","The Supreme Court can compel the President to sign if there is clear public interest","Congress can override with only the Senate's 2/3 if the House majority is sufficient"],
+   ans:1,
+   exp:"Article I §7: veto override requires 2/3 of both chambers. House needs 290 of 435; Senate needs 67 of 100. With 267 and 63 respectively, both fall short of the 2/3 threshold. This illustrates the veto's power: even broad majority support isn't enough — the President can force genuine supermajority consensus."},
+
+  {id:26,cat:"Checks & Balances",
+   scenario:"The House votes 235–200 to impeach the President. The Senate holds 58 seats for the opposing party.",
+   q:"For removal from office, what must happen?",
+   opts:["A simple majority of 51 senators must vote to convict","Two-thirds of senators present (67 if all 100 attend) must vote to convict","The Chief Justice casts the deciding vote if the Senate is tied","The House must hold a second affirmation vote after the Senate's conviction"],
+   ans:1,
+   exp:"Article I §3: The House impeaches by majority vote (like a grand jury indictment); the Senate tries the case. Conviction requires 2/3 of senators present. The Chief Justice presides over presidential impeachment trials but does NOT vote. No president has ever been removed — Johnson, Clinton, and Trump (twice) were all acquitted."},
+
+  {id:27,cat:"Checks & Balances",
+   scenario:"The President nominates a federal appeals court judge. The Senate votes 48–52 to reject the nomination.",
+   q:"What constitutional principle explains why this rejection is legitimate?",
+   opts:["The Senate can reject nominees only when clearly unqualified — political rejections are unconstitutional","The Appointments Clause (Art. II §2) gives the Senate advice and consent power — a deliberate check on executive appointments","Senate rejections require a 2/3 supermajority, so this simple majority rejection is invalid","The President can bypass the Senate with a recess appointment that lasts indefinitely"],
+   ans:1,
+   exp:"Article II §2 requires presidential nomination and Senate advice and consent for federal judges and major executive officers. The Senate can reject nominees for any reason — including pure political disagreement, as it did with Merrick Garland in 2016. The Framers specifically wanted to prevent the President from stacking courts and agencies unopposed."},
+
+  {id:28,cat:"Checks & Balances",
+   q:"The 'power of the purse' is considered Congress's most potent check on the executive because:",
+   opts:["Congress's commerce power taxes activities it disapproves of","Every federal program depends on congressional appropriation — the President cannot spend money Congress hasn't authorized (Art. I §9)","The Senate's treaty ratification power controls all foreign spending","The House's revenue origination power prevents the Senate from initiating any taxation"],
+   ans:1,
+   exp:"Article I §9: no money shall be drawn from the Treasury except by appropriation made by law. Every federal program, agency, and military operation depends on congressional funding. Congress can defund executive programs, use budget battles to extract policy concessions, and threaten government shutdowns. Presidents cannot unilaterally spend on programs Congress hasn't funded."},
+
+  // ── LEGISLATIVE BRANCH ───────────────────────────────────────────────────────
+  {id:29,cat:"Legislative Branch",
+   q:"The Constitution requires all revenue bills to originate in the House. The primary reason is:",
+   opts:["The Senate was intended for foreign policy, so domestic taxation was assigned to the House","The House, directly elected every 2 years with proportional representation, was seen as most democratically accountable for taxation decisions","The Senate's equal state representation would let small states impose unfair tax burdens on large states","The President can only veto revenue bills originating in the Senate, not the House"],
+   ans:1,
+   exp:"The origination clause reflects 'no taxation without representation' — tax bills should come from the most democratically accountable chamber. House members face election every 2 years and represent smaller, more responsive districts. The Senate was originally appointed by state legislatures (changed by the 17th Amendment in 1913) — less directly democratic."},
+
+  {id:30,cat:"Legislative Branch",
+   scenario:"A Senate majority has 55 votes but cannot reach 60 to end debate on a healthcare bill. A minority of 45 senators continues speaking indefinitely.",
+   q:"What Senate procedure is illustrated, and what does it reflect?",
+   opts:["The pocket veto — Senate's equivalent of the presidential pocket veto","The filibuster and cloture — reflecting the Senate's role as a 'cooling saucer' requiring supermajority consensus","Advice and consent — minority senators blocking until presidential nominees are confirmed","Bicameralism — Senate refusal forces the bill back to the House"],
+   ans:1,
+   exp:"The filibuster (unlimited debate) and cloture (60-vote threshold to end debate) illustrate the Senate's deliberative design. Jefferson reportedly said the Senate is to the House as a saucer is to coffee — it cools hot legislation. The 60-vote threshold forces bipartisan consensus on major legislation."},
+
+  {id:31,cat:"Legislative Branch",
+   scenario:"Congress passes a major education bill and sends it to the President with 8 days remaining before Congress adjourns. The President neither signs nor vetoes it.",
+   q:"What happens?",
+   opts:["The bill automatically becomes law after 10 days without presidential action","The bill is killed — this is a 'pocket veto,' and Congress cannot override since it has adjourned","The bill is returned with the President's objections for a 30-day override window","The Supreme Court must rule on whether the bill becomes law"],
+   ans:1,
+   exp:"Article I §7 creates the pocket veto: if the President holds a bill for 10 days (excluding Sundays) AND Congress adjourns before those 10 days expire, the bill dies. Congress cannot override because it's not in session. The pocket veto lets Presidents quietly kill legislation without a formal veto that might be overridden."},
+
+  {id:32,cat:"Legislative Branch",
+   q:"How does a constitutional amendment differ from regular legislation?",
+   opts:["Amendments require a presidential signature; regular legislation can be passed over a veto","Amendments require 2/3 of Congress plus ratification by 3/4 of states; regular legislation needs only a majority in both chambers plus presidential signature or veto override","Amendments can only address individual rights; regular legislation handles policy matters","Amendments require unanimous state ratification; regular legislation requires only a congressional majority"],
+   ans:1,
+   exp:"Regular legislation: simple majority in House and Senate + presidential signature (or 2/3 veto override). Constitutional amendment: 2/3 in both chambers + ratification by 3/4 of states (38 of 50). Critically, the President has NO role in amendments — bypassing the executive entirely. The supermajority requirement means amendments require genuinely broad national consensus."},
+
+  {id:33,cat:"Legislative Branch",
+   q:"The Necessary & Proper Clause is called the 'elastic clause' because:",
+   opts:["It was written to be deliberately vague so future generations could interpret it freely","It allows Congress to pass laws 'necessary and proper' for executing any enumerated power, giving Congress flexible implied powers beyond what's explicitly listed","It can stretch the Bill of Rights to cover new technologies the Framers couldn't anticipate","It allows the President to stretch executive orders to cover any policy area in emergencies"],
+   ans:1,
+   exp:"The N&P Clause states Congress may make all laws 'necessary and proper for carrying into Execution the foregoing Powers.' Marshall interpreted 'necessary' broadly in McCulloch v. Maryland — not 'absolutely indispensable' but 'useful' or 'conducive.' This gave Congress implied powers to legislate far beyond Article I §8's specific enumeration."},
+
+  // ── EXECUTIVE BRANCH ─────────────────────────────────────────────────────────
+  {id:34,cat:"Executive Branch",
+   q:"Which of the following is an implied executive power NOT explicitly in Article II?",
+   opts:["Serving as Commander-in-Chief of the armed forces","Issuing executive orders to direct the federal bureaucracy","Granting pardons for federal offenses","Nominating ambassadors and federal officers"],
+   ans:1,
+   exp:"Executive orders are an implied power derived from the President's duty to 'take care that the laws be faithfully executed' (Art. II §3) and as head of the executive branch. They can be struck down by courts if they exceed constitutional or statutory authority, overturned by new executive orders, or nullified by Congress withdrawing funding."},
+
+  {id:35,cat:"Executive Branch",
+   q:"The 22nd Amendment (1951) establishing a two-term presidential limit was most directly a response to:",
+   opts:["Truman's abuse of executive power during the Korean War","FDR winning four elections (1932, 36, 40, 44), alarming Congress about an imperial presidency","The realization that single-term presidents were less effective","Wilson's attempt to seek a third term despite his stroke"],
+   ans:1,
+   exp:"Washington established the two-term norm by voluntary retirement. FDR broke it by winning 4 elections, alarming those who feared permanent executive entrenchment. The 22nd Amendment codified Washington's norm as constitutional law. It reflects ongoing tension between presidential effectiveness and the danger of power concentration."},
+
+  {id:36,cat:"Executive Branch",
+   q:"The President's Commander-in-Chief role grants which powers?",
+   opts:["The power to declare war, deploy troops, and set military strategy without oversight","Operational command of the military, subject to Congress's powers to declare war, fund the military, and regulate the armed forces","Unilateral authority to commit the U.S. to any military alliance without Senate ratification","Power to suspend civil liberties during wartime, superseding congressional statutes"],
+   ans:1,
+   exp:"The Framers deliberately split war powers: Congress declares war and funds the military (Art. I); the President commands it operationally (Art. II). Neither branch has complete control. The War Powers Resolution (1973) attempted to define this balance. In practice, presidential power has expanded dramatically but Congress retains the power to defund operations it opposes."},
+
+  {id:37,cat:"Executive Branch",
+   q:"Which clause of Article II gives the President broad administrative control over the executive branch?",
+   opts:["The Appointments Clause — allowing the President to nominate all federal officers","The Take Care Clause — the President 'shall take Care that the Laws be faithfully executed'","The Pardon Clause — giving the President clemency authority over federal crimes","The Treaty Clause — giving the President authority to negotiate international agreements"],
+   ans:1,
+   exp:"Article II §3's Take Care Clause — the President 'shall take Care that the Laws be faithfully executed' — is the constitutional basis for broad presidential administrative authority, executive orders, and direction of the federal bureaucracy. It establishes the President as chief executive in the literal sense: responsible for implementing every law Congress passes."},
+
+  // ── JUDICIAL REVIEW ──────────────────────────────────────────────────────────
+  {id:38,cat:"Judicial Review",
+   scenario:"In 1803, Secretary of State Madison refused to deliver Marbury's judicial commission signed by outgoing President Adams. Marbury asked the Supreme Court to order delivery.",
+   q:"Chief Justice Marshall's ruling established which two key principles?",
+   opts:["Marbury was entitled to his commission AND the Court could order Madison to deliver it","Marbury was entitled to his commission, but the Court lacked jurisdiction — AND courts can strike down laws that conflict with the Constitution","Madison was correct to withhold the commission; the Court cannot review executive decisions","The Court must defer to Congress on all matters of appointment"],
+   ans:1,
+   exp:"Marshall's political genius: he sided with Jefferson politically (didn't force him to deliver the commission) while claiming enormous judicial power. The §13 of the Judiciary Act was unconstitutional — it expanded the Court's original jurisdiction beyond Article III. By 'losing' the small case, Marshall won judicial review: courts can strike down laws that violate the Constitution."},
+
+  {id:39,cat:"Judicial Review",
+   q:"Judicial review is considered 'countermajoritarian' because:",
+   opts:["The Court's decisions are made by a simple majority of 5 justices, not a supermajority","Unelected, life-tenured justices can strike down laws passed by elected representatives reflecting majority will","Court decisions often take decades to implement, delaying democratic outcomes","The President appoints justices without congressional input, bypassing democratic accountability"],
+   ans:1,
+   exp:"The 'countermajoritarian difficulty': in a democracy, how can unelected life-tenured judges legitimately override elected legislatures? Answers range from 'courts protect individual rights from majority tyranny' (Hamilton) to 'courts should defer to legislatures except on clear constitutional violations' (judicial restraint). This tension underlies every major Supreme Court confirmation battle."},
+
+  {id:40,cat:"Judicial Review",
+   q:"When the Supreme Court interprets a federal statute narrowly to avoid a constitutional question, it is exercising:",
+   opts:["Strict constructionism — applying only the literal text of the Constitution","Constitutional avoidance — courts prefer statutory interpretations that don't require ruling on constitutional questions","Judicial activism — the Court is exceeding its authority by rewriting legislation","Stare decisis — following prior precedent regardless of current constitutional questions"],
+   ans:1,
+   exp:"The doctrine of constitutional avoidance holds that courts should interpret statutes to avoid constitutional questions where possible, resolving cases on statutory grounds first. This reflects judicial restraint — courts intervening in the constitutional dimension only when unavoidable. Chief Justice Roberts used this approach in NFIB v. Sebelius (2012), reading the ACA's individual mandate as a tax to avoid striking it down under the Commerce Clause."},
+
+  // ── FEDERALISM ───────────────────────────────────────────────────────────────
+  {id:41,cat:"Federalism",
+   q:"The Supremacy Clause (Article VI) establishes that when state and federal law conflict:",
+   opts:["States may refuse to enforce federal laws they believe are unconstitutional (nullification)","Federal law is supreme and preempts conflicting state law — states cannot override valid federal statutes","The Supreme Court must hold a special hearing to determine which law takes precedence","State laws passed before the conflicting federal law take precedence under grandfather principles"],
+   ans:1,
+   exp:"The Supremacy Clause is unambiguous: the Constitution, federal laws, and treaties 'shall be the supreme Law of the Land.' States cannot nullify federal law. The doctrine of federal preemption flows directly from the Supremacy Clause: where Congress has acted in a field, conflicting state laws are invalid."},
+
+  {id:42,cat:"Federalism",
+   q:"The 10th Amendment's reserved powers doctrine protects which state authority?",
+   opts:["Regulating interstate commerce between states","Establishing criminal law and police powers within state borders","Coining money and establishing monetary policy","Declaring war and maintaining national defense"],
+   ans:1,
+   exp:"The 10th Amendment reserves to states powers 'not delegated to the United States.' The 'police power' — regulating health, safety, morals, and welfare within state borders — is the core state reserved power. Criminal law, family law, education, land use, professional licensing, and local governance are presumptively state territory."},
+
+  {id:43,cat:"Federalism",
+   scenario:"The federal government requires all states to raise the minimum drinking age to 21 or lose 10% of federal highway funding. South Dakota challenges this as coercive.",
+   q:"How did the Supreme Court rule in South Dakota v. Dole (1987)?",
+   opts:["Unconstitutional — the 10th Amendment gives states absolute authority over drinking ages","Constitutional — spending conditions are valid when related to a federal interest and not unduly coercive; losing 5-10% of highway funds is an incentive, not compulsion","Invalid because Congress must regulate drinking ages directly rather than through conditional spending","Valid only because all 50 states ultimately agreed to comply"],
+   ans:1,
+   exp:"South Dakota v. Dole upheld the spending condition under 4 requirements: (1) spending for general welfare, (2) conditions stated clearly, (3) conditions related to the federal program interest, (4) not unduly coercive. The Court later drew a clearer coercion line in NFIB v. Sebelius (2012), striking down the Medicaid expansion's threat to revoke ALL existing Medicaid funding."},
+
+  {id:44,cat:"Federalism",
+   q:"Cooperative federalism ('marble cake' model) differs from dual federalism ('layer cake' model) in that:",
+   opts:["Dual federalism involves more federal spending; cooperative federalism involves more state spending","Cooperative federalism features federal and state governments jointly administering programs with blurred responsibilities; dual federalism features clear separation of federal and state authority","Dual federalism emerged after the New Deal; cooperative federalism dominated the 19th century","Cooperative federalism gives states more independence; dual federalism gives the federal government more control"],
+   ans:1,
+   exp:"Dual federalism (19th century): clear separation — federal government handles enumerated powers, states handle everything else ('layer cake'). Cooperative federalism (post-New Deal): federal and state responsibilities are intermixed through joint programs — federal funding + state administration + federal conditions ('marble cake'). Programs like Medicaid, highways, and education reflect cooperative federalism."},
+
+  {id:45,cat:"Federalism",
+   scenario:"Congress passes an environmental law requiring states to meet specific air quality standards but provides no federal funding for compliance.",
+   q:"What is this called, and why do states object?",
+   opts:["A categorical grant — states object because they prefer block grants with more discretion","An unfunded mandate — states must comply but bear all compliance costs themselves, shifting federal policy costs to states","Federal preemption — states object because their own environmental laws are automatically invalidated","A block grant — states object because they have too much discretion and insufficient guidance"],
+   ans:1,
+   exp:"Unfunded mandates are federal requirements states must comply with (Supremacy Clause) but that come without federal funding to cover compliance costs. States bear the financial burden of implementing federal policy — sometimes hundreds of millions annually. The Unfunded Mandates Reform Act (1995) requires Congress to estimate costs above $50M but is easily circumvented."},
+
+  {id:46,cat:"Federalism",
+   q:"Which of the following best distinguishes categorical grants from block grants?",
+   opts:["Categorical grants provide more money; block grants fund smaller programs","Categorical grants fund specific programs with strict federal conditions; block grants provide lump sums for broad purpose areas with more state discretion. States prefer block grants.","Block grants require identical conditions to categorical grants but fund larger programs; states have no preference","Categorical grants can only be used for education; block grants can be used for any purpose"],
+   ans:1,
+   exp:"Categorical grants (e.g., Title I education funding): highly specific purpose, detailed federal regulations, compliance reporting. Block grants (e.g., CDBG): lump sum for broad area with significant state discretion. States consistently prefer block grants as preserving state autonomy. The federal government often prefers categorical grants to ensure national policy priorities are actually funded."},
+
+  {id:47,cat:"Federalism",
+   scenario:"A state legalizes recreational marijuana. The federal Controlled Substances Act classifies marijuana as Schedule I. A federal prosecutor charges a dispensary owner.",
+   q:"What constitutional principle resolves this conflict?",
+   opts:["The 9th Amendment — unenumerated rights include the right to use marijuana as a personal matter","The Supremacy Clause — federal law preempts conflicting state law; states cannot nullify federal statutes","The 10th Amendment — state drug laws automatically override federal statutes under reserved powers","Dual federalism — federal and state governments have entirely separate spheres, so neither can regulate the other's domain"],
+   ans:1,
+   exp:"The Supremacy Clause makes federal law supreme. States can legalize marijuana under state law but cannot prevent federal prosecution under the CSA. The real-world outcome depends on federal enforcement priorities — the Obama DOJ de-prioritized enforcement in states that had legalized; other administrations took stricter approaches. Constitutional principle (federal supremacy) is separate from enforcement policy."},
+
+  // ── KEY CONSTITUTIONAL CLAUSES ───────────────────────────────────────────────
+  {id:48,cat:"Key Constitutional Clauses",
+   q:"The Commerce Clause (Art. I §8 cl. 3) was interpreted broadly in Gibbons v. Ogden (1824) to include:",
+   opts:["Only the physical exchange of goods across state lines; manufacturing and production are state matters","All commercial intercourse between states — navigation, transportation, and the movement enabling commerce — with federal authority superseding conflicting state regulations","Exclusively foreign trade; states retain full authority over commerce between states","Manufacturing and agriculture but not transportation or services"],
+   ans:1,
+   exp:"Marshall held in Gibbons v. Ogden that commerce is 'all commercial intercourse' — not just the exchange of commodities but everything that makes it possible, including navigation. Federal law (giving Gibbons a coastal trade license) superseded New York's steamboat monopoly. This broad reading became the constitutional basis for most 20th century federal regulatory power."},
+
+  {id:49,cat:"Key Constitutional Clauses",
+   q:"In U.S. v. Lopez (1995), the Supreme Court struck down the Gun-Free School Zones Act. What limit did this place on the Commerce Clause?",
+   opts:["Congress can only regulate commerce that physically crosses state lines — anything local is beyond federal reach","Congress cannot regulate non-economic local activities that do not substantially affect interstate commerce — the clause is not a general federal police power","Congress may only regulate commerce involving goods, not services or activities","The Commerce Clause cannot regulate conduct covered by state criminal law"],
+   ans:1,
+   exp:"Lopez was the first Commerce Clause limitation in 60 years. Rehnquist held that gun possession near a school is: (1) not an economic activity, (2) not part of a larger regulatory scheme of economic activity, (3) has only an attenuated connection to interstate commerce. Accepting the government's argument would give Congress unlimited police power — there's nothing it couldn't regulate."},
+
+  {id:50,cat:"Key Constitutional Clauses",
+   q:"The 14th Amendment's incorporation doctrine means:",
+   opts:["States must formally adopt the Bill of Rights into their own constitutions to be bound by it","The Bill of Rights, originally applicable only to the federal government, applies to state governments through the 14th Amendment's Due Process Clause","States can choose to opt into or out of specific Bill of Rights protections through state referendum","Federal courts can incorporate state law into their decisions when there is no applicable federal statute"],
+   ans:1,
+   exp:"Originally, the Bill of Rights constrained only the federal government (Barron v. Baltimore, 1833). The 14th Amendment's Due Process Clause — 'nor shall any State deprive any person of life, liberty, or property, without due process of law' — became the vehicle for incorporating almost all Bill of Rights provisions against states. States cannot now violate freedom of speech, right to counsel, protection against unreasonable searches, etc."},
+
+  // ── LANDMARK CASES ───────────────────────────────────────────────────────────
+  {id:51,cat:"Landmark Cases",
+   q:"McCulloch v. Maryland (1819) is significant for which two holdings?",
+   opts:["Established judicial review AND supremacy of state courts over federal agencies","Upheld Congress's implied power to create a national bank (via N&P Clause) AND held states cannot tax federal instrumentalities","Struck down the national bank as unconstitutional AND established full state sovereignty in economic matters","Upheld federal preemption of state banking law AND required equal federal funding for state banks"],
+   ans:1,
+   exp:"McCulloch has two parts: (1) IMPLIED FEDERAL POWER — a national bank is constitutional under the N&P Clause even if not listed in Art. I §8. Marshall: 'Let the end be legitimate... all means which are appropriate... are constitutional.' (2) STATE TAX IMMUNITY — Maryland cannot tax the federal bank. 'The power to tax involves the power to destroy.'"},
+
+  {id:52,cat:"Landmark Cases",
+   scenario:"Congress passes a law requiring local law enforcement to conduct background checks on gun purchasers. A county sheriff argues this conscripts state officials to implement federal law.",
+   q:"Based on Printz v. United States (1997), how would the Court rule?",
+   opts:["The law is valid because states must implement federal laws under the Supremacy Clause","The law is unconstitutional — Congress cannot commandeer state executive officers to enforce federal regulatory programs","The law is valid because gun control involves interstate commerce giving Congress plenary authority","The law is invalid only if the state explicitly refuses and federal employees are unavailable"],
+   ans:1,
+   exp:"Printz v. United States struck down Brady Act provisions requiring local law enforcement to conduct background checks. Justice Scalia: the Constitution's structural separation prevents Congress from conscripting state officers to implement federal law. Congress can (1) regulate individuals directly, (2) offer conditional grants, or (3) create a federal program — but cannot commandeer state executives."},
+
+  {id:53,cat:"Landmark Cases",
+   q:"Baker v. Carr (1962) held that:",
+   opts:["Racial segregation in public schools violated the 14th Amendment's Equal Protection Clause","Federal courts could hear challenges to state legislative redistricting — apportionment was not a non-justiciable 'political question'","The Commerce Clause did not extend to local agricultural production","States could not impose poll taxes as conditions for voting"],
+   ans:1,
+   exp:"Baker v. Carr opened federal courts to redistricting challenges. Tennessee had not redrawn its districts for 60 years, massively under-representing urban voters. The Warren Court held this was a justiciable equal protection issue, not a political question. This set the stage for Reynolds v. Sims (1964), which established 'one person, one vote.'"},
+
+  {id:54,cat:"Landmark Cases",
+   q:"Shaw v. Reno (1993) held that:",
+   opts:["States cannot use race as any factor in drawing legislative district lines","Racial gerrymandering — drawing bizarrely shaped districts based predominantly on race — can violate Equal Protection even if the intent is to create majority-minority districts","The Voting Rights Act requires states to create majority-minority districts wherever minority populations are sufficient","States have absolute discretion in congressional redistricting as a reserved power"],
+   ans:1,
+   exp:"Shaw v. Reno addressed North Carolina's extremely elongated district drawn to create a majority Black district. O'Connor's majority: when race is the predominant factor in drawing district lines, this triggers strict scrutiny under the Equal Protection Clause. Racial gerrymandering — even with benign intent — requires compelling justification. This creates tension with the Voting Rights Act's mandate to protect minority voting power."},
+
+  {id:55,cat:"Landmark Cases",
+   q:"In NFIB v. Sebelius (2012), Chief Justice Roberts upheld the ACA's individual mandate but on which basis?",
+   opts:["The Commerce Clause — Congress can regulate any activity that affects interstate commerce","The Necessary & Proper Clause — the mandate is necessary for the larger regulatory scheme to function","The Taxing Power — the penalty for not having insurance functions as a tax, and Congress's taxing power is broad","The General Welfare Clause — Congress can spend money for any purpose related to the general welfare"],
+   ans:2,
+   exp:"Roberts upheld the individual mandate as a valid exercise of Congress's taxing power, even though the government primarily argued Commerce Clause authority. Roberts rejected the Commerce Clause argument (you cannot compel economic activity under the Commerce Clause), but found the penalty functioned as a tax and was thus constitutional. He also struck down the Medicaid expansion's coercive funding threat as going beyond South Dakota v. Dole's 'inducement' standard."},
+
+  // ── AMENDMENTS ───────────────────────────────────────────────────────────────
+  {id:56,cat:"Constitutional Amendments",
+   q:"The 17th Amendment (1913) changed Senate elections from state legislature appointment to direct popular election, most directly:",
+   opts:["Increased state influence over the Senate by giving citizens more leverage","Reduced state legislative power over the Senate and made senators more directly accountable to voters rather than state political establishments","Gave the President more control over the Senate by removing the state legislature intermediary","Increased Senate power relative to the House by granting senators greater democratic legitimacy"],
+   ans:1,
+   exp:"The original Constitution had senators appointed by state legislatures — giving states direct representation in the federal government. Progressive Era reformers argued this made senators corrupt (beholden to state machine politics). The 17th Amendment made senators directly elected — more accountable to voters but less accountable to state governments. Federalism critics argue this was a significant loss for state power in the constitutional structure."},
+
+  {id:57,cat:"Constitutional Amendments",
+   scenario:"A constitutional amendment limiting congressional terms has passed both chambers with a 2/3 majority. A student argues only 35 states need to ratify it.",
+   q:"Is the student correct?",
+   opts:["No — amendments require ratification by all 50 states because they change fundamental representation rules","No — 3/4 of 50 states is 37.5, requiring 38 states, not 35","Yes — 2/3 of 50 states is approximately 35, matching the congressional approval threshold","Yes — 35 states have historically been the threshold for major constitutional changes"],
+   ans:1,
+   exp:"Article V requires 3/4 of states to ratify — 3/4 of 50 = 37.5, meaning 38 states must ratify (you cannot have half a state). The student confused the congressional proposal threshold (2/3 ≈ 33 states) with the state ratification threshold (3/4 = 38 states). Two different fractions, two different actors. The President has no role in either."},
+
+  {id:58,cat:"Constitutional Amendments",
+   q:"The 25th Amendment (1967) established procedures for:",
+   opts:["Vice presidential succession AND handling presidential disability or incapacity","Impeachment of the Vice President AND congressional appointment of a new President if both are removed","Automatic power transfer during national emergency AND a co-executive appointment power","Presidential succession in elections AND term limits for the Vice President"],
+   ans:0,
+   exp:"The 25th Amendment addressed succession gaps: (1) VP becomes President if the President dies, resigns, or is removed; (2) President can voluntarily transfer power to VP during temporary incapacity (§3); (3) VP and Cabinet majority can declare the President unable to discharge duties (§4); (4) President can nominate a new VP (confirmed by both chambers) if that office becomes vacant — used after VP Agnew resigned and after Nixon resigned."},
+
+  {id:59,cat:"Constitutional Amendments",
+   q:"The 14th Amendment overturned Dred Scott v. Sandford (1857) primarily through which provision?",
+   opts:["Equal Protection Clause — guaranteeing equal treatment under law regardless of race","Citizenship Clause — 'All persons born or naturalized in the United States... are citizens,' overriding Dred Scott's denial of citizenship to Black Americans","Due Process Clause — guaranteeing no state can deny liberty without due process","Privileges or Immunities Clause — guaranteeing states cannot abridge privileges of U.S. citizenship"],
+   ans:1,
+   exp:"The 14th Amendment's opening line directly overturned Dred Scott: 'All persons born or naturalized in the United States... are citizens.' Dred Scott had held Black people could never be U.S. citizens regardless of free or enslaved status. The Citizenship Clause made birthright citizenship a constitutional guarantee. The Equal Protection Clause then became the basis for challenging racial discrimination — used in Brown v. Board and beyond."},
+
+  // ── ELECTORAL COLLEGE ────────────────────────────────────────────────────────
+  {id:60,cat:"Elections & Electoral College",
+   q:"The Electoral College allocates electoral votes to states in which way?",
+   opts:["Equal allocation — each state receives 10 electoral votes regardless of population","Proportional allocation — electoral votes distributed based on each state's share of the national popular vote","Each state receives electoral votes equal to its total congressional representation (House seats + 2 Senators)","Each state receives electoral votes equal only to its House seats, directly reflecting population"],
+   ans:2,
+   exp:"Each state's electoral votes = House seats (population-based) + 2 Senate seats (equal for all states). This means small states are slightly over-represented relative to pure population. Wyoming's 3 electoral votes represent ~193,000 people each; California's 54 represent ~740,000 each. The 'Senate bonus' for all states is a direct legacy of equal Senate representation. 270 of 538 total electoral votes win the presidency."},
+
+  {id:61,cat:"Elections & Electoral College",
+   q:"A candidate who wins the national popular vote could still lose the presidential election because:",
+   opts:["The Electoral College counts only votes from registered party members","Most states use winner-take-all allocation — winning a state by 1 vote earns all its electoral votes, making it possible to win more electoral votes with fewer total popular votes","The President is actually chosen by the House in all presidential elections","Electoral votes are weighted by voter turnout, rewarding states with higher civic participation"],
+   ans:1,
+   exp:"Winner-take-all (used by 48 states): a candidate winning several large states by narrow margins while losing others by large margins can win more electoral votes with fewer total popular votes. This happened in 2000 (Gore won popular vote, Bush won Electoral College) and 2016 (Clinton won popular vote, Trump won Electoral College)."},
+
+  {id:62,cat:"Elections & Electoral College",
+   q:"If no presidential candidate wins 270 electoral votes, the 12th Amendment provides that:",
+   opts:["The candidate with the most popular votes nationally wins","The House of Representatives elects the President, with each state delegation casting ONE vote — giving small states equal power","The Senate elects the President from among the top two electoral vote recipients","The election repeats within 90 days with the same candidates"],
+   ans:1,
+   exp:"The 12th Amendment: if no candidate wins 270, the House chooses from the top THREE electoral vote recipients — with each STATE delegation casting one vote (not each member). Wyoming's single representative and California's 52 members each get one vote. This massively over-represents small states. This has happened twice: 1824 (House chose Adams over popular vote winner Jackson) and 1876 (resolved by special commission)."},
+
+  // ── POLITICAL INSTITUTIONS ───────────────────────────────────────────────────
+  {id:63,cat:"Political Institutions",
+   q:"Which of the following is NOT a linkage institution that connects citizens to government?",
+   opts:["Political parties — organizing citizens around platforms and candidates","Interest groups — representing specific constituencies in the policy process","The federal bureaucracy — implementing laws and regulations","Media — informing citizens and setting the political agenda"],
+   ans:2,
+   exp:"Linkage institutions connect citizens to government decision-making: political parties, interest groups, elections, and media. The federal bureaucracy is a governmental institution — it implements policy but doesn't primarily serve as a channel connecting citizens to government. It's on the 'government' side of the citizen-government relationship."},
+
+  {id:64,cat:"Political Institutions",
+   q:"The U.S. two-party system is primarily maintained by which structural feature?",
+   opts:["A constitutional provision explicitly requiring two major parties","Single-member district plurality voting ('winner-take-all') — where only one candidate wins each district, making third-party success nearly impossible","The Electoral College's requirement that candidates win a majority of electoral votes","Congressional rules denying committee seats to members not affiliated with the two major parties"],
+   ans:1,
+   exp:"'Duverger's Law': in single-member district plurality systems, voters rationally avoid 'wasting' votes on third parties with no realistic chance of winning, and parties rationally merge to form winning coalitions. Proportional representation systems (used in most European democracies) allow multiple parties to win seats proportional to their vote share — fostering multiparty systems. The Constitution doesn't require two parties, but our electoral structure strongly incentivizes it."},
+
+  {id:65,cat:"Political Institutions",
+   q:"The House Rules Committee's function in the legislative process is to:",
+   opts:["Review bills for constitutionality before they reach the full House","Determine the terms of floor debate for each bill — setting time limits, amendment rules, and scheduling votes","Assign newly introduced bills to the appropriate committee for hearings","Negotiate conference committee agreements between the House and Senate versions of a bill"],
+   ans:1,
+   exp:"The House Rules Committee is the 'traffic cop' of the House — it controls floor access for major legislation: time limits for debate, whether and what amendments are allowed (open, closed, or structured rules), and scheduling. This is necessary because the House has 435 members and must operate efficiently. The Senate (100 members) relies on unanimous consent agreements — but absent agreement, any senator can filibuster, giving the Senate minority much more power than their House counterpart."}
+];
+
+// ══════════════════════════════════════════
+// APP
+// ══════════════════════════════════════════
+const ALL_CATS = ["All", ...Array.from(new Set(BANK.map(q=>q.cat)))];
+
+let roundSize = 15;
+let selectedCat = "All";
+let activeQs = [];
+let current = 0;
+let answered = {};
+let score = 0;
+
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-.5); }
+function getPool(){ return selectedCat==="All" ? BANK : BANK.filter(q=>q.cat===selectedCat); }
+
+function buildRound(){
+  const pool = getPool();
+  const n = Math.min(roundSize, pool.length);
+  activeQs = shuffle(pool).slice(0,n);
+  current=0; answered={}; score=0;
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+(function initHome(){
+  document.querySelectorAll('#size-pills .pill').forEach(p=>{
+    p.addEventListener('click',()=>{
+      document.querySelectorAll('#size-pills .pill').forEach(x=>x.classList.remove('sel'));
+      p.classList.add('sel');
+      roundSize=parseInt(p.dataset.val);
+    });
+  });
+  const cp=document.getElementById('cat-pills');
+  ALL_CATS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='pill'+(c==="All"?' sel':'');
+    b.textContent=c;
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('#cat-pills .pill').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');
+      selectedCat=c;
+    });
+    cp.appendChild(b);
+  });
+})();
+
+function goHome(){ show('screen-home'); }
+
+// ── QUIZ ──────────────────────────────────────────────────────────────────────
+function startQuiz(){ buildRound(); show('screen-quiz'); renderQ(); }
+
+function renderQ(){
+  const q=activeQs[current];
+  const total=activeQs.length;
+  document.getElementById('prog-label').textContent=`Question ${current+1} of ${total}`;
+  document.getElementById('cat-label').textContent=q.cat;
+  document.getElementById('progress-fill').style.width=Math.round((current/total)*100)+'%';
+  document.getElementById('score-pill').textContent='+'+score;
+  document.getElementById('q-category').textContent=q.cat;
+  const sc=document.getElementById('q-scenario');
+  if(q.scenario){sc.textContent='📋 '+q.scenario;sc.style.display='block';}
+  else{sc.style.display='none';}
+  document.getElementById('q-text').textContent=q.q;
+  const optsEl=document.getElementById('options');
+  optsEl.innerHTML='';
+  const isAnswered=answered[q.id]!==undefined;
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.disabled=isAnswered;
+    if(isAnswered){
+      if(i===q.ans) btn.classList.add('correct');
+      else if(i===answered[q.id]) btn.classList.add('wrong');
+    }
+    btn.innerHTML=`<span class="opt-letter">${String.fromCharCode(65+i)}.</span><span>${opt}</span>`;
+    btn.addEventListener('click',()=>selectAnswer(i));
+    optsEl.appendChild(btn);
+  });
+  const expEl=document.getElementById('explanation');
+  if(isAnswered){
+    const right=answered[q.id]===q.ans;
+    expEl.innerHTML=`<strong>${right?'✓ Correct — ':'✗ Incorrect — '}</strong>${q.exp}`;
+    expEl.className='explanation'+(right?'':' wrong-exp');
+    expEl.style.display='block';
+  } else { expEl.style.display='none'; }
+  document.getElementById('btn-prev').disabled=current===0;
+  document.getElementById('btn-next').textContent=current+1===total?'See Results →':'Next →';
+}
+
+function selectAnswer(i){
+  const q=activeQs[current];
+  if(answered[q.id]!==undefined) return;
+  answered[q.id]=i;
+  if(i===q.ans) score++;
+  renderQ();
+}
+function nextQ(){ if(current+1>=activeQs.length){showResults();return;} current++;renderQ(); }
+function prevQ(){ if(current>0){current--;renderQ();} }
+
+// ── RESULTS ───────────────────────────────────────────────────────────────────
+function showResults(){
+  show('screen-results');
+  const total=activeQs.length;
+  const pct=Math.round((score/total)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  document.getElementById('res-fraction').textContent=`${score} of ${total} correct`;
+  document.getElementById('res-correct').textContent=score;
+  document.getElementById('res-wrong').textContent=total-score;
+  document.getElementById('res-total').textContent=total;
+  const msgs=['💡 Keep working through the material. Try filtering by category to drill weak areas.','📖 Getting there. Review the explanations for missed questions.','📚 Solid performance. Focus on the categories where you struggled.','🏛️ Excellent. You have a strong command of AP Gov Units 1 & 2.'];
+  document.getElementById('res-msg').textContent=pct>=88?msgs[3]:pct>=72?msgs[2]:pct>=55?msgs[1]:msgs[0];
+
+  // category breakdown
+  const catMap={};
+  activeQs.forEach(q=>{
+    if(!catMap[q.cat]) catMap[q.cat]={c:0,t:0};
+    catMap[q.cat].t++;
+    if(answered[q.id]===q.ans) catMap[q.cat].c++;
+  });
+
+  let html='';
+  if(Object.keys(catMap).length>1){
+    html+='<div class="review-section-title">Category Breakdown</div><div class="cat-grid">';
+    Object.entries(catMap).forEach(([cat,{c,t}])=>{
+      const p=Math.round((c/t)*100);
+      const col=p>=80?'var(--green)':p>=55?'var(--gold)':'var(--red)';
+      html+=`<div class="cat-card"><div class="cat-pct" style="color:${col}">${p}%</div><div class="cat-name">${cat}<br><span style="color:var(--text)">${c}/${t} correct</span></div></div>`;
+    });
+    html+='</div>';
+  }
+
+  const missed=activeQs.filter(q=>answered[q.id]!==undefined&&answered[q.id]!==q.ans);
+  if(missed.length>0){
+    html+='<div class="review-section-title">Missed Questions — Review</div><div class="review-list">';
+    missed.forEach(q=>{
+      html+=`<div class="review-item">
+        <div class="review-q">${q.q}</div>
+        <div class="review-a">Your answer: <span style="color:var(--red)">${q.opts[answered[q.id]]}</span></div>
+        <div class="review-a">Correct: <span style="color:var(--green)">${q.opts[q.ans]}</span></div>
+        <div class="review-exp">${q.exp}</div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('review-section').innerHTML=html;
+}
+
+// ── UTIL ──────────────────────────────────────────────────────────────────────
+function show(id){
+  ['screen-home','screen-quiz','screen-results'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.classList.remove('active'); el.style.display='none';
+  });
+  const el=document.getElementById(id);
+  el.style.display='flex'; el.classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
